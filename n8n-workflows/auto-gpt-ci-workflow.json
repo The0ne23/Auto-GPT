@@ -2,177 +2,145 @@
   "name": "Auto-GPT CI Workflow",
   "nodes": [
     {
-      "parameters": {},
-      "id": "webhook-trigger",
-      "name": "Webhook Trigger",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "auto-gpt-ci",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "d5e0e8c1-3a1b-4f2c-9e5a-7d8f9e1c2b3a",
+      "name": "Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 1,
       "position": [250, 300],
-      "webhookId": "auto-gpt-ci"
+      "webhookId": "auto-gpt-ci",
+      "disabled": false
     },
     {
       "parameters": {
-        "command": "git clone {{ $json.repository_url }} /tmp/auto-gpt && cd /tmp/auto-gpt && git checkout {{ $json.branch }}"
+        "command": "git clone {{ $json.body.repository_url }} /tmp/auto-gpt-{{ $json.body.pr_number }} && cd /tmp/auto-gpt-{{ $json.body.pr_number }} && git checkout {{ $json.body.branch }}"
       },
-      "id": "checkout-code",
-      "name": "Checkout Repository",
+      "id": "a1b2c3d4-5e6f-7g8h-9i0j-1k2l3m4n5o6p",
+      "name": "Checkout Code",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [450, 300]
+      "position": [450, 300],
+      "disabled": false
     },
     {
       "parameters": {
-        "command": "cd /tmp/auto-gpt && python -m pip install --upgrade pip && pip install -r requirements.txt"
+        "command": "cd /tmp/auto-gpt-{{ $json.body.pr_number }} && python -m pip install --upgrade pip && pip install -r requirements.txt"
       },
-      "id": "install-deps",
+      "id": "b2c3d4e5-6f7g-8h9i-0j1k-2l3m4n5o6p7q",
       "name": "Install Dependencies",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [650, 300]
+      "position": [650, 300],
+      "disabled": false
     },
     {
       "parameters": {
-        "command": "cd /tmp/auto-gpt && flake8"
+        "command": "cd /tmp/auto-gpt-{{ $json.body.pr_number }} && flake8"
       },
-      "id": "lint-flake8",
-      "name": "Lint with flake8",
+      "id": "c3d4e5f6-7g8h-9i0j-1k2l-3m4n5o6p7q8r",
+      "name": "Lint flake8",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [850, 200]
+      "position": [850, 200],
+      "disabled": false
     },
     {
       "parameters": {
-        "command": "cd /tmp/auto-gpt && black . --check"
+        "command": "cd /tmp/auto-gpt-{{ $json.body.pr_number }} && black . --check"
       },
-      "id": "check-black",
-      "name": "Check Black Formatting",
+      "id": "d4e5f6g7-8h9i-0j1k-2l3m-4n5o6p7q8r9s",
+      "name": "Check Black",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [850, 300]
+      "position": [850, 300],
+      "disabled": false
     },
     {
       "parameters": {
-        "command": "cd /tmp/auto-gpt && isort . --check"
+        "command": "cd /tmp/auto-gpt-{{ $json.body.pr_number }} && isort . --check"
       },
-      "id": "check-isort",
-      "name": "Check isort Formatting",
+      "id": "e5f6g7h8-9i0j-1k2l-3m4n-5o6p7q8r9s0t",
+      "name": "Check isort",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [850, 400]
+      "position": [850, 400],
+      "disabled": false
     },
     {
       "parameters": {
-        "command": "cd /tmp/auto-gpt && mypy"
+        "command": "cd /tmp/auto-gpt-{{ $json.body.pr_number }} && mypy"
       },
-      "id": "check-mypy",
-      "name": "Check mypy Formatting",
+      "id": "f6g7h8i9-0j1k-2l3m-4n5o-6p7q8r9s0t1u",
+      "name": "Check mypy",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [850, 500]
+      "position": [850, 500],
+      "disabled": false
     },
     {
       "parameters": {
-        "command": "cd /tmp/auto-gpt && pytest -n auto --cov=autogpt --cov-report term-missing --cov-branch --cov-report xml --cov-report term"
+        "command": "cd /tmp/auto-gpt-{{ $json.body.pr_number }} && pytest -n auto --cov=autogpt --cov-report term-missing --cov-branch --cov-report xml --cov-report term"
       },
-      "id": "run-tests",
-      "name": "Run Tests with Coverage",
+      "id": "g7h8i9j0-1k2l-3m4n-5o6p-7q8r9s0t1u2v",
+      "name": "Run Tests",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [1050, 300]
+      "position": [1050, 300],
+      "disabled": false
     },
     {
       "parameters": {
-        "command": "cd /tmp/auto-gpt && find tests -type f -name '*.yaml' -print0 | xargs -0 git add"
+        "command": "cd /tmp/auto-gpt-{{ $json.body.pr_number }} && find tests -type f -name '*.yaml' | head -10"
       },
-      "id": "stage-cassettes",
-      "name": "Stage Test Cassettes",
+      "id": "h8i9j0k1-2l3m-4n5o-6p7q-8r9s0t1u2v3w",
+      "name": "Check Cassettes",
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
-      "position": [1250, 300]
+      "position": [1250, 300],
+      "disabled": false
     },
     {
       "parameters": {
-        "command": "cd /tmp/auto-gpt && git diff --cached --quiet tests || (git config user.name 'Auto-GPT-Bot' && git config user.email 'github-bot@agpt.co' && git commit -m 'Add new cassettes' && git push origin {{ $json.branch }})"
-      },
-      "id": "commit-push",
-      "name": "Commit and Push Changes",
-      "type": "n8n-nodes-base.executeCommand",
-      "typeVersion": 1,
-      "position": [1450, 300]
-    },
-    {
-      "parameters": {
-        "resource": "issue",
-        "operation": "createComment",
-        "owner": "={{ $json.repository_owner }}",
-        "repository": "={{ $json.repository_name }}",
-        "issueNumber": "={{ $json.pr_number }}",
-        "body": "✅ CI Pipeline completed successfully!\n\nLinting: Passed\nTests: Passed\n\nIf cassettes were updated, please run:\n```bash\ngit fetch\ngit rebase origin/{{ $json.branch }}\n```"
-      },
-      "id": "github-comment",
-      "name": "Post GitHub Comment",
-      "type": "n8n-nodes-base.github",
-      "typeVersion": 1,
-      "position": [1650, 300],
-      "credentials": {
-        "githubApi": {
-          "id": "1",
-          "name": "GitHub account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "boolean": [
+        "values": {
+          "string": [
             {
-              "value1": "={{ $json.success }}",
-              "value2": true
+              "name": "status",
+              "value": "success"
+            },
+            {
+              "name": "message",
+              "value": "CI Pipeline completed successfully!"
             }
           ]
-        }
+        },
+        "options": {}
       },
-      "id": "check-success",
-      "name": "Check if Successful",
-      "type": "n8n-nodes-base.if",
+      "id": "i9j0k1l2-3m4n-5o6p-7q8r-9s0t1u2v3w4x",
+      "name": "Set Success",
+      "type": "n8n-nodes-base.set",
       "typeVersion": 1,
-      "position": [1250, 450]
-    },
-    {
-      "parameters": {
-        "resource": "issue",
-        "operation": "createComment",
-        "owner": "={{ $json.repository_owner }}",
-        "repository": "={{ $json.repository_name }}",
-        "issueNumber": "={{ $json.pr_number }}",
-        "body": "❌ CI Pipeline failed!\n\nPlease check the logs and fix the issues.\n\nError: {{ $json.error }}"
-      },
-      "id": "github-comment-fail",
-      "name": "Post Failure Comment",
-      "type": "n8n-nodes-base.github",
-      "typeVersion": 1,
-      "position": [1450, 550],
-      "credentials": {
-        "githubApi": {
-          "id": "1",
-          "name": "GitHub account"
-        }
-      }
+      "position": [1450, 300],
+      "disabled": false
     }
   ],
   "connections": {
-    "Webhook Trigger": {
+    "Webhook": {
       "main": [
         [
           {
-            "node": "Checkout Repository",
+            "node": "Checkout Code",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Checkout Repository": {
+    "Checkout Code": {
       "main": [
         [
           {
@@ -187,122 +155,88 @@
       "main": [
         [
           {
-            "node": "Lint with flake8",
+            "node": "Lint flake8",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Check Black Formatting",
+            "node": "Check Black",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Check isort Formatting",
+            "node": "Check isort",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Check mypy Formatting",
+            "node": "Check mypy",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Lint with flake8": {
+    "Lint flake8": {
       "main": [
         [
           {
-            "node": "Run Tests with Coverage",
+            "node": "Run Tests",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Check Black Formatting": {
+    "Check Black": {
       "main": [
         [
           {
-            "node": "Run Tests with Coverage",
+            "node": "Run Tests",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Check isort Formatting": {
+    "Check isort": {
       "main": [
         [
           {
-            "node": "Run Tests with Coverage",
+            "node": "Run Tests",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Check mypy Formatting": {
+    "Check mypy": {
       "main": [
         [
           {
-            "node": "Run Tests with Coverage",
+            "node": "Run Tests",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Run Tests with Coverage": {
+    "Run Tests": {
       "main": [
         [
           {
-            "node": "Stage Test Cassettes",
+            "node": "Check Cassettes",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Stage Test Cassettes": {
+    "Check Cassettes": {
       "main": [
         [
           {
-            "node": "Commit and Push Changes",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Check if Successful",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Commit and Push Changes": {
-      "main": [
-        [
-          {
-            "node": "Post GitHub Comment",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Check if Successful": {
-      "main": [
-        [
-          {
-            "node": "Post GitHub Comment",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Post Failure Comment",
+            "node": "Set Success",
             "type": "main",
             "index": 0
           }
@@ -310,23 +244,13 @@
       ]
     }
   },
+  "pinData": {},
   "settings": {
-    "saveManualExecutions": true,
-    "callerPolicy": "workflowsFromSameOwner",
-    "errorWorkflow": ""
+    "executionOrder": "v1"
   },
   "staticData": null,
-  "tags": [
-    {
-      "name": "CI/CD",
-      "id": "1"
-    },
-    {
-      "name": "Auto-GPT",
-      "id": "2"
-    }
-  ],
-  "triggerCount": 1,
+  "tags": [],
+  "triggerCount": 0,
   "updatedAt": "2025-11-04T00:00:00.000Z",
-  "versionId": "1"
+  "versionId": ""
 }
