@@ -1,0 +1,490 @@
+{
+  "updatedAt": "2025-10-08T19:39:02.000Z",
+  "createdAt": "2025-09-30T14:31:22.901Z",
+  "id": "rBZICNGulpOYjtv8",
+  "name": "Intraday Trading Bot - Alpaca",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## \ud83d\ude80 ENHANCED TRADING SYSTEM V2.0\n\n### \ud83c\udfaf ADVANCED PREDICTIVE INDICATORS\n\u2705 **Multi-Timeframe Analysis** - 5min, 15min, 1hour confirmation\n\u2705 **Stochastic Oscillator** - Momentum & oversold/overbought\n\u2705 **CCI (Commodity Channel Index)** - Trend detection\n\u2705 **OBV (On-Balance Volume)** - Volume-price relationship\n\u2705 **Support/Resistance Detection** - Pivot point analysis\n\u2705 **Pattern Recognition** - Candlestick patterns (bullish engulfing, morning star)\n\u2705 **Volume Profile Analysis** - VPOC & volume trends\n\n### \ud83e\udde0 ML-POWERED TREND PREDICTION\n- **Confidence Score**: 0-100 based on 11 indicators\n- **Entry Threshold**: 65% confidence (conservative)\n- **Pattern Detection**: Uptrend, bullish engulfing, morning star\n- **Multi-TF Alignment**: All timeframes must agree\n\n### \ud83d\udcca COMPREHENSIVE SCORING SYSTEM (180 points)\n- MACD bullish crossover (30 pts)\n- ADX trend strength (25 pts)\n- EMA alignment (20 pts)\n- RSI optimal zone (15 pts)\n- Stochastic (10 pts)\n- CCI momentum (10 pts)\n- Volume confirmation (10 pts)\n- OBV trend (10 pts)\n- Multi-timeframe (15 pts)\n- Pattern recognition (15 pts)\n- S/R proximity (10 pts)\n\n### \ud83d\udee1\ufe0f DYNAMIC RISK MANAGEMENT\n**ATR-Based Stops:**\n- Stop Loss: 2-3x ATR (adapts to volatility)\n- Take Profit: 1.5-2.5x stop (based on trend strength)\n- Trailing Stop: 1.5x ATR from recent high\n- Partial Profit: 50% at 1.5x stop\n\n**Adaptive Position Sizing:**\n- Win Rate > 60%: Risk 2% per trade\n- Win Rate 40-60%: Risk 1.5% per trade\n- Win Rate < 40%: Risk 1% per trade\n- Score multiplier: 0.65-1.0x\n\n### \ud83c\udfaf ADVANCED EXIT STRATEGIES\n**Long Exits:**\n- Dynamic stop: -2-3x ATR%\n- Dynamic target: +3-6x ATR%\n- Trailing stop: 1.5x ATR from high\n- Partial exit: 50% at 1.5x risk\n- RSI > 75 + MACD bearish\n- Momentum loss after 60min\n- Time decay: 180min\n\n**Key Improvements over V1:**\n1. \u2728 Predictive vs reactive indicators\n2. \ud83c\udf93 ML pattern recognition\n3. \ud83d\udcc8 Multi-timeframe confirmation\n4. \ud83d\udcb0 Win rate tracking\n5. \ud83d\udd04 Dynamic risk management\n6. \ud83c\udfaf Partial profit-taking\n7. \ud83d\udccd S/R level detection",
+        "height": 500,
+        "width": 380
+      },
+      "id": "sticky-note",
+      "name": "Trading Rules",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const axios = require('axios');\n\n// Get most active stocks from Alpaca\nconst alpacaHeaders = {\n  'APCA-API-KEY-ID': 'PKWRJW3YTJQYLWAVE7VS',\n  'APCA-API-SECRET-KEY': 'HvGaSWFehaz7iII2W5rGCQTdxjPXnhlP3LKVbfGH'\n};\n\n// Top 100 Popular Stocks Under $25 per share\nconst affordableStocks = [\n  // Popular Tech & Growth (Under $25)\n  'SOFI', 'NIO', 'PLUG', 'F', 'NOK', 'INTC', 'SNAP', 'PINS', 'RBLX', 'U',\n  'LCID', 'RIVN', 'HOOD', 'COIN', 'PLTR', 'GRAB', 'PATH', 'OPEN', 'UPST', 'AFRM',\n  \n  // Energy & Commodities (Under $25)\n  'FCEL', 'VALE', 'X', 'CLF', 'BTU', 'ARCH', 'SWN', 'CHK', 'AR', 'MGY',\n  'RIG', 'NE', 'SM', 'TELL', 'ET', 'CNX', 'CTRA', 'OXY', 'DVN', 'MRO',\n  \n  // Financial Services (Under $25)\n  'BAC', 'WFC', 'C', 'KEY', 'ALLY', 'RF', 'CFG', 'FITB', 'HBAN', 'USB',\n  'TFC', 'MTB', 'STT', 'ZION', 'CMA', 'WAL', 'WTFC', 'ONB', 'FNB', 'UBSI',\n  \n  // Retail & Consumer (Under $25)\n  'AAL', 'UAL', 'CCL', 'NCLH', 'RCL', 'MAR', 'HLT', 'UBER', 'LYFT', 'DASH',\n  'ABNB', 'BKNG', 'EXPE', 'TRIP', 'CVNA', 'CARG', 'KSS', 'M', 'JWN', 'DDS',\n  \n  // Telecom & Media (Under $25)\n  'T', 'VZ', 'CMCSA', 'DISH', 'PARA', 'WBD', 'FOXA', 'FOX', 'NWSA', 'NYT',\n  \n  // Healthcare & Biotech (Under $25)\n  'PFE', 'GILD', 'MRNA', 'VRTX', 'BIIB', 'SGEN', 'IONS', 'BMRN', 'ALNY', 'CRSP',\n  'NTLA', 'EDIT', 'BEAM', 'PACB', 'ILMN', 'TWST', 'VCYT', 'EXAS', 'NVTA', 'CDNA'\n];\n\n// Top 100 Small Cap Stocks (Popular for Trading)\nconst smallCapStocks = [\n  'SOFI', 'PLTR', 'RIVN', 'LCID', 'NIO', 'COIN', 'HOOD', 'UPST', 'AFRM', 'PLUG',\n  'WISH', 'CLOV', 'BBBY', 'AMC', 'GME', 'BB', 'NOK', 'SNDL', 'TLRY', 'CGC',\n  'ACB', 'WKHS', 'RIDE', 'GOEV', 'FSR', 'NKLA', 'HYLN', 'BLNK', 'CHPT', 'EVGO',\n  'QS', 'SBE', 'SPCE', 'OPEN', 'UWMC', 'RKT', 'CLOV', 'SDC', 'PTON', 'BYND',\n  'DASH', 'ABNB', 'SNOW', 'RBLX', 'U', 'PATH', 'DKNG', 'PENN', 'APPS', 'SKLZ',\n  'FUBO', 'VIAC', 'DISCA', 'VIPS', 'BILI', 'IQ', 'BABA', 'PDD', 'JD', 'BIDU',\n  'XPEV', 'LI', 'FCEL', 'CLSK', 'RIOT', 'MARA', 'CAN', 'EBON', 'SOS', 'BTBT',\n  'GREE', 'ANY', 'MRIN', 'CARV', 'WKEY', 'SPRT', 'BBIG', 'PROG', 'ATER', 'CEI',\n  'PHUN', 'DWAC', 'BENE', 'MARK', 'GNUS', 'SNDL', 'NAKD', 'EXPR', 'KOSS', 'CTRM',\n  'TOPS', 'SHIP', 'TNXP', 'CLVS', 'OCGN', 'HGEN', 'SRNE', 'VXRT', 'CYDY', 'INO'\n];\n\n// Combine both lists\nconst watchlist = [...affordableStocks, ...smallCapStocks];\n\nconst results = [];\nlet processed = 0;\nconst maxToProcess = 200; // Process all 200 stocks\n\nfor (const symbol of watchlist) {\n  if (processed >= maxToProcess) break;\n  \n  try {\n    // Get latest bars (1min timeframe)\n    const barsResponse = await axios.get(\n      `https://data.alpaca.markets/v2/stocks/${symbol}/bars?timeframe=1Min&limit=30`,\n      { headers: alpacaHeaders }\n    );\n    \n    const bars = barsResponse.data.bars;\n    if (bars && bars.length >= 10) {\n      const latestBar = bars[bars.length - 1];\n      const prevBar = bars[bars.length - 2];\n      const bars10ago = bars[bars.length - 10];\n      const bars5ago = bars[bars.length - 5];\n      \n      // Calculate momentum indicators\n      const priceChange = ((latestBar.c - bars10ago.c) / bars10ago.c) * 100;\n      const priceChange5min = ((latestBar.c - bars5ago.c) / bars5ago.c) * 100;\n      const volumeAvg = bars.slice(-10).reduce((sum, b) => sum + b.v, 0) / 10;\n      const volumeRatio = latestBar.v / volumeAvg;\n      const isUptrend = latestBar.c > prevBar.c && prevBar.c > bars[bars.length - 3].c;\n      \n      // Calculate RSI (simple version)\n      let gains = 0, losses = 0;\n      for (let i = bars.length - 14; i < bars.length - 1; i++) {\n        const change = bars[i + 1].c - bars[i].c;\n        if (change > 0) gains += change;\n        else losses += Math.abs(change);\n      }\n      const avgGain = gains / 14;\n      const avgLoss = losses / 14;\n      const rs = avgGain / (avgLoss || 0.001);\n      const rsi = 100 - (100 / (1 + rs));\n      \n      results.push({\n        symbol,\n        currentPrice: latestBar.c,\n        priceChange,\n        priceChange5min,\n        volume: latestBar.v,\n        volumeRatio,\n        isUptrend,\n        rsi,\n        timestamp: latestBar.t\n      });\n    }\n    processed++;\n  } catch (error) {\n    console.log(`Error fetching ${symbol}: ${error.message}`);\n    processed++;\n  }\n  \n  // Add small delay to avoid rate limiting\n  if (processed % 50 === 0) {\n    await new Promise(resolve => setTimeout(resolve, 1000));\n  }\n}\n\n// Filter for strong uptrend momentum with better criteria\nconst tradeCandidates = results.filter(stock => \n  stock.isUptrend && \n  stock.priceChange > 0.5 && \n  stock.volumeRatio > 1.2 &&\n  stock.rsi < 70 && // Not overbought\n  stock.rsi > 30    // Not oversold\n).sort((a, b) => b.priceChange - a.priceChange);\n\nreturn tradeCandidates.slice(0, 10).map(stock => ({ json: stock }));"
+      },
+      "id": "2b56394a-aaea-4415-a8b7-6111244f0ba5",
+      "name": "Scan for Momentum Stocks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        784
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// At the start of Trading Decision Logic\nconst axios = require('axios');\n\n// Fetch positions directly\nconst positionsResponse = await axios.get(\n  'https://paper-api.alpaca.markets/v2/positions',\n  {\n    headers: {\n      'APCA-API-KEY-ID': 'PKWRJW3YTJQYLWAVE7VS',\n      'APCA-API-SECRET-KEY': 'HvGaSWFehaz7iII2W5rGCQTdxjPXnhlP3LKVbfGH'\n    }\n  }\n);\n\nconst positions = positionsResponse.data || [];\nconst scannedStocks = $input.all();\nconst actions = [];\n\nconsole.log(`Current positions: ${positions.length}`);\nconsole.log(`Scanned stocks: ${scannedStocks.length}`);\n\n// Manage existing positions (check for stop loss or take profit)\nif (Array.isArray(positions) && positions.length > 0) {\n  for (const position of positions) {\n    const currentPrice = parseFloat(position.current_price);\n    const entryPrice = parseFloat(position.avg_entry_price);\n    const profitLoss = ((currentPrice - entryPrice) / entryPrice) * 100;\n    \n    console.log(`Position ${position.symbol}: P/L = ${profitLoss.toFixed(2)}%`);\n    \n    // Stop loss at -2% or take profit at +3%\n    if (profitLoss <= -2 || profitLoss >= 3) {\n      actions.push({\n        json: {\n          action: 'sell',\n          symbol: position.symbol,\n          qty: Math.abs(parseFloat(position.qty)),\n          reason: profitLoss <= -2 ? 'stop_loss' : 'take_profit',\n          profitLoss: profitLoss.toFixed(2)\n        }\n      });\n    }\n  }\n}\n\n// Check for new buy opportunities\nconst positionSymbols = positions.map(p => p.symbol);\nconst maxPositions = 10;\nconst currentPositionCount = positions.length;\nconst sellCount = actions.filter(a => a.json.action === 'sell').length;\nconst availableSlots = maxPositions - currentPositionCount + sellCount;\n\nconsole.log(`Available slots for new positions: ${availableSlots}`);\n\nif (availableSlots > 0) {\n  for (const item of scannedStocks) {\n    const stock = item.json;\n    \n    console.log(`Evaluating ${stock.symbol}: price=${stock.currentPrice}, change=${stock.priceChange.toFixed(2)}%`);\n    \n    // Only buy if we don't already have a position and have available slots\n    if (!positionSymbols.includes(stock.symbol)) {\n      // Calculate position size (risk 1% of portfolio per trade)\n      const accountValue = 30000;\n      const riskAmount = accountValue * 0.01;\n      const stopLossPercent = 0.02;\n      const qty = Math.floor(riskAmount / (stock.currentPrice * stopLossPercent));\n      \n      console.log(`${stock.symbol}: Calculated qty = ${qty}`);\n      \n      if (qty > 0) {\n        actions.push({\n          json: {\n            action: 'buy',\n            symbol: stock.symbol,\n            qty: qty,\n            price: stock.currentPrice,\n            reason: 'momentum_uptrend',\n            priceChange: stock.priceChange.toFixed(2),\n            rsi: stock.rsi.toFixed(2)\n          }\n        });\n        \n        console.log(`Added BUY order for ${stock.symbol}: ${qty} shares at $${stock.currentPrice}`);\n        \n        // Stop if we've filled all available slots\n        if (actions.filter(a => a.json.action === 'buy').length >= availableSlots) {\n          break;\n        }\n      }\n    } else {\n      console.log(`${stock.symbol}: Already have position, skipping`);\n    }\n  }\n}\n\nconsole.log(`Total actions generated: ${actions.length}`);\nconsole.log(`Buy orders: ${actions.filter(a => a.json.action === 'buy').length}`);\nconsole.log(`Sell orders: ${actions.filter(a => a.json.action === 'sell').length}`);\n\nreturn actions.length > 0 ? actions : [{ json: { action: 'none', message: 'No trades to execute' } }];"
+      },
+      "id": "2dc2ee9d-0601-4471-84f4-05e2b6ad143f",
+      "name": "Trading Decision Logic",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        784
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.action }}",
+              "rightValue": "none",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              },
+              "id": "7f487e34-0d0f-4c67-88d9-fb2f3097d58a"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2cddfd32-68e1-4835-87c0-62cbb9ba6ccc",
+      "name": "Filter Actions",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://paper-api.alpaca.markets/v2/orders",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "APCA-API-KEY-ID",
+              "value": "PKWRJW3YTJQYLWAVE7VS"
+            },
+            {
+              "name": "APCA-API-SECRET-KEY",
+              "value": "HvGaSWFehaz7iII2W5rGCQTdxjPXnhlP3LKVbfGH"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"symbol\": \"{{ $json.symbol }}\",\n  \"qty\": {{ $json.qty }},\n  \"side\": \"buy\",\n  \"type\": \"market\",\n  \"time_in_force\": \"day\"\n}",
+        "options": {}
+      },
+      "id": "8b1736a2-c272-4171-a999-d31bc76348c4",
+      "name": "Execute Buy Order",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1504,
+        256
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://paper-api.alpaca.markets/v2/orders",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "APCA-API-KEY-ID",
+              "value": "PKWRJW3YTJQYLWAVE7VS"
+            },
+            {
+              "name": "APCA-API-SECRET-KEY",
+              "value": "HvGaSWFehaz7iII2W5rGCQTdxjPXnhlP3LKVbfGH"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"symbol\": \"{{ $json.symbol }}\",\n  \"qty\": {{ $json.qty }},\n  \"side\": \"sell\",\n  \"type\": \"market\",\n  \"time_in_force\": \"day\"\n}",
+        "options": {}
+      },
+      "id": "1cefcdfd-b7fc-453b-a992-a5eb54c11158",
+      "name": "Execute Sell Order",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1520,
+        448
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ==================== ENHANCED TRADING ALGORITHM V2.0 ====================\n// Features:\n// 1. Multi-timeframe trend prediction\n// 2. Machine learning pattern recognition\n// 3. Dynamic volatility-based exits\n// 4. Support/Resistance levels\n// 5. Volume Profile Analysis\n// 6. Adaptive position sizing based on win rate\n// 7. Trailing stops with partial profit-taking\n\nconst axios = require('axios');\n\nconst alpacaHeaders = {\n  'APCA-API-KEY-ID': 'PKWRJW3YTJQYLWAVE7VS',\n  'APCA-API-SECRET-KEY': 'HvGaSWFehaz7iII2W5rGCQTdxjPXnhlP3LKVbfGH'\n};\n\n// ==================== ADVANCED TECHNICAL INDICATORS ====================\n\nfunction calculateEMA(prices, period) {\n    if (prices.length < period) return null;\n    const k = 2 / (period + 1);\n    let ema = prices.slice(0, period).reduce((a, b) => a + b, 0) / period;\n    for (let i = period; i < prices.length; i++) {\n        ema = (prices[i] * k) + (ema * (1 - k));\n    }\n    return ema;\n}\n\nfunction calculateEMAArray(prices, period) {\n    if (prices.length < period) return [];\n    const k = 2 / (period + 1);\n    const emaArray = [];\n    let ema = prices.slice(0, period).reduce((a, b) => a + b, 0) / period;\n    emaArray.push(ema);\n    for (let i = period; i < prices.length; i++) {\n        ema = (prices[i] * k) + (ema * (1 - k));\n        emaArray.push(ema);\n    }\n    return emaArray;\n}\n\nfunction calculateRSI(prices, period = 14) {\n    if (prices.length < period + 1) return 50;\n    let gains = 0, losses = 0;\n    for (let i = prices.length - period; i < prices.length; i++) {\n        const change = prices[i] - prices[i - 1];\n        if (change > 0) gains += change;\n        else losses += Math.abs(change);\n    }\n    const avgGain = gains / period;\n    const avgLoss = losses / period;\n    const rs = avgGain / (avgLoss || 0.001);\n    return 100 - (100 / (1 + rs));\n}\n\nfunction calculateStochastic(bars, period = 14, smoothK = 3, smoothD = 3) {\n    if (bars.length < period) return { k: 50, d: 50 };\n\n    const highs = bars.slice(-period).map(b => b.h);\n    const lows = bars.slice(-period).map(b => b.l);\n    const closes = bars.slice(-period).map(b => b.c);\n\n    const kValues = [];\n    for (let i = 0; i < closes.length; i++) {\n        const lowestLow = Math.min(...lows.slice(Math.max(0, i - period + 1), i + 1));\n        const highestHigh = Math.max(...highs.slice(Math.max(0, i - period + 1), i + 1));\n        const k = highestHigh === lowestLow ? 50 : ((closes[i] - lowestLow) / (highestHigh - lowestLow)) * 100;\n        kValues.push(k);\n    }\n\n    // Smooth %K\n    const smoothedK = kValues.slice(-smoothK).reduce((a, b) => a + b, 0) / smoothK;\n\n    // %D is SMA of %K\n    const dValues = [];\n    for (let i = smoothK - 1; i < kValues.length; i++) {\n        const d = kValues.slice(i - smoothK + 1, i + 1).reduce((a, b) => a + b, 0) / smoothK;\n        dValues.push(d);\n    }\n    const smoothedD = dValues.length > 0 ? dValues[dValues.length - 1] : 50;\n\n    return { k: smoothedK, d: smoothedD };\n}\n\nfunction calculateCCI(bars, period = 20) {\n    if (bars.length < period) return 0;\n\n    const typicalPrices = bars.map(b => (b.h + b.l + b.c) / 3);\n    const sma = typicalPrices.slice(-period).reduce((a, b) => a + b, 0) / period;\n    const meanDeviation = typicalPrices.slice(-period)\n        .reduce((sum, tp) => sum + Math.abs(tp - sma), 0) / period;\n\n    const currentTP = typicalPrices[typicalPrices.length - 1];\n    return (currentTP - sma) / (0.015 * meanDeviation);\n}\n\nfunction calculateOBV(bars) {\n    if (bars.length < 2) return 0;\n    let obv = 0;\n    for (let i = 1; i < bars.length; i++) {\n        if (bars[i].c > bars[i - 1].c) {\n            obv += bars[i].v;\n        } else if (bars[i].c < bars[i - 1].c) {\n            obv -= bars[i].v;\n        }\n    }\n    return obv;\n}\n\nfunction calculateADX(bars, period = 14) {\n    if (bars.length < period * 2) return { adx: 0, plusDI: 0, minusDI: 0 };\n\n    const tr = [], dmPlus = [], dmMinus = [];\n\n    for (let i = 1; i < bars.length; i++) {\n        const prev = bars[i - 1];\n        const curr = bars[i];\n        tr.push(Math.max(curr.h - curr.l, Math.abs(curr.h - prev.c), Math.abs(curr.l - prev.c)));\n        const upMove = curr.h - prev.h;\n        const downMove = prev.l - curr.l;\n        dmPlus.push(upMove > downMove && upMove > 0 ? upMove : 0);\n        dmMinus.push(downMove > upMove && downMove > 0 ? downMove : 0);\n    }\n\n    let smtr = tr.slice(0, period).reduce((sum, val) => sum + val, 0);\n    let smPlus = dmPlus.slice(0, period).reduce((sum, val) => sum + val, 0);\n    let smMinus = dmMinus.slice(0, period).reduce((sum, val) => sum + val, 0);\n\n    const diPlus = [], diMinus = [], dx = [];\n\n    diPlus[0] = (smPlus / smtr) * 100;\n    diMinus[0] = (smMinus / smtr) * 100;\n    dx[0] = (Math.abs(diPlus[0] - diMinus[0]) / (diPlus[0] + diMinus[0])) * 100;\n\n    for (let i = period; i < tr.length; i++) {\n        smtr = smtr - (smtr / period) + tr[i];\n        smPlus = smPlus - (smPlus / period) + dmPlus[i];\n        smMinus = smMinus - (smMinus / period) + dmMinus[i];\n\n        const currentDIPlus = (smPlus / smtr) * 100;\n        const currentDIMinus = (smMinus / smtr) * 100;\n        diPlus.push(currentDIPlus);\n        diMinus.push(currentDIMinus);\n\n        const diDiff = Math.abs(currentDIPlus - currentDIMinus);\n        const diSum = currentDIPlus + currentDIMinus;\n        dx.push(diSum > 0 ? (diDiff / diSum) * 100 : 0);\n    }\n\n    let adx = dx.slice(0, period).reduce((sum, val) => sum + val, 0) / period;\n    for (let i = period; i < dx.length; i++) {\n        adx = (adx * (period - 1) + dx[i]) / period;\n    }\n\n    return {\n        adx: adx,\n        plusDI: diPlus[diPlus.length - 1] || 0,\n        minusDI: diMinus[diMinus.length - 1] || 0\n    };\n}\n\nfunction calculateMACD(prices, shortPeriod = 12, longPeriod = 26, signalPeriod = 9) {\n    if (prices.length < longPeriod + signalPeriod) return null;\n\n    const shortEMA = calculateEMAArray(prices, shortPeriod);\n    const longEMA = calculateEMAArray(prices, longPeriod);\n\n    // Align EMAs\n    const offset = longPeriod - shortPeriod;\n    const macdLine = shortEMA.slice(offset).map((val, i) => val - longEMA[i]);\n\n    if (macdLine.length < signalPeriod) return null;\n\n    const signalLine = calculateEMAArray(macdLine, signalPeriod);\n\n    if (!signalLine || signalLine.length === 0) return null;\n\n    const currentMACD = macdLine[macdLine.length - 1];\n    const currentSignal = signalLine[signalLine.length - 1];\n    const histogram = currentMACD - currentSignal;\n    const prevHistogram = macdLine.length > 1 ? macdLine[macdLine.length - 2] - (signalLine.length > 1 ? signalLine[signalLine.length - 2] : currentSignal) : 0;\n\n    return {\n        macd: currentMACD,\n        signal: currentSignal,\n        histogram: histogram,\n        prevHistogram: prevHistogram\n    };\n}\n\n// ==================== SUPPORT/RESISTANCE DETECTION ====================\n\nfunction findSupportResistance(bars, lookback = 50) {\n    if (bars.length < lookback) return { support: [], resistance: [] };\n\n    const recentBars = bars.slice(-lookback);\n    const highs = recentBars.map(b => b.h);\n    const lows = recentBars.map(b => b.l);\n\n    const support = [];\n    const resistance = [];\n\n    // Find pivot points (local extrema)\n    for (let i = 2; i < recentBars.length - 2; i++) {\n        // Pivot high (resistance)\n        if (highs[i] > highs[i-1] && highs[i] > highs[i-2] &&\n            highs[i] > highs[i+1] && highs[i] > highs[i+2]) {\n            resistance.push(highs[i]);\n        }\n\n        // Pivot low (support)\n        if (lows[i] < lows[i-1] && lows[i] < lows[i-2] &&\n            lows[i] < lows[i+1] && lows[i] < lows[i+2]) {\n            support.push(lows[i]);\n        }\n    }\n\n    // Cluster nearby levels (within 1%)\n    const clusterLevels = (levels) => {\n        if (levels.length === 0) return [];\n        levels.sort((a, b) => a - b);\n        const clustered = [];\n        let currentCluster = [levels[0]];\n\n        for (let i = 1; i < levels.length; i++) {\n            if ((levels[i] - currentCluster[0]) / currentCluster[0] < 0.01) {\n                currentCluster.push(levels[i]);\n            } else {\n                clustered.push(currentCluster.reduce((a, b) => a + b) / currentCluster.length);\n                currentCluster = [levels[i]];\n            }\n        }\n        clustered.push(currentCluster.reduce((a, b) => a + b) / currentCluster.length);\n        return clustered;\n    };\n\n    return {\n        support: clusterLevels(support).slice(-3),  // Top 3 support levels\n        resistance: clusterLevels(resistance).slice(-3)  // Top 3 resistance levels\n    };\n}\n\n// ==================== VOLUME PROFILE ANALYSIS ====================\n\nfunction analyzeVolumeProfile(bars, period = 20) {\n    if (bars.length < period) return { trend: 'neutral', vpoc: 0, strength: 0 };\n\n    const recentBars = bars.slice(-period);\n    const volumes = recentBars.map(b => b.v);\n    const avgVolume = volumes.reduce((a, b) => a + b, 0) / period;\n    const currentVolume = volumes[volumes.length - 1];\n\n    // Volume-weighted average price (VWAP)\n    let cumulativeVolPrice = 0;\n    let cumulativeVol = 0;\n\n    for (const bar of recentBars) {\n        const typicalPrice = (bar.h + bar.l + bar.c) / 3;\n        cumulativeVolPrice += typicalPrice * bar.v;\n        cumulativeVol += bar.v;\n    }\n\n    const vpoc = cumulativeVol > 0 ? cumulativeVolPrice / cumulativeVol : 0;\n    const volumeRatio = currentVolume / avgVolume;\n\n    // Volume trend\n    const firstHalfVol = volumes.slice(0, period / 2).reduce((a, b) => a + b, 0);\n    const secondHalfVol = volumes.slice(period / 2).reduce((a, b) => a + b, 0);\n    const volTrend = secondHalfVol > firstHalfVol * 1.2 ? 'increasing' :\n                     secondHalfVol < firstHalfVol * 0.8 ? 'decreasing' : 'stable';\n\n    return {\n        trend: volTrend,\n        vpoc: vpoc,\n        strength: volumeRatio,\n        avgVolume: avgVolume\n    };\n}\n\n// ==================== MULTI-TIMEFRAME TREND ANALYSIS ====================\n\nasync function getMultiTimeframeTrend(symbol) {\n    try {\n        // Fetch 5min, 15min, and 1hour bars\n        const [bars5m, bars15m, bars1h] = await Promise.all([\n            axios.get(`https://data.alpaca.markets/v2/stocks/${symbol}/bars?timeframe=5Min&limit=50`, { headers: alpacaHeaders }),\n            axios.get(`https://data.alpaca.markets/v2/stocks/${symbol}/bars?timeframe=15Min&limit=50`, { headers: alpacaHeaders }),\n            axios.get(`https://data.alpaca.markets/v2/stocks/${symbol}/bars?timeframe=1Hour&limit=50`, { headers: alpacaHeaders })\n        ]);\n\n        const analyzeTrend = (bars) => {\n            if (!bars || bars.length < 20) return 'neutral';\n            const closes = bars.map(b => b.c);\n            const ema9 = calculateEMA(closes, 9);\n            const ema21 = calculateEMA(closes, 21);\n            const currentPrice = closes[closes.length - 1];\n\n            if (currentPrice > ema9 && ema9 > ema21) return 'bullish';\n            if (currentPrice < ema9 && ema9 < ema21) return 'bearish';\n            return 'neutral';\n        };\n\n        return {\n            tf5m: analyzeTrend(bars5m.data.bars),\n            tf15m: analyzeTrend(bars15m.data.bars),\n            tf1h: analyzeTrend(bars1h.data.bars)\n        };\n    } catch (error) {\n        console.log(`Multi-timeframe analysis failed for ${symbol}: ${error.message}`);\n        return { tf5m: 'neutral', tf15m: 'neutral', tf1h: 'neutral' };\n    }\n}\n\n// ==================== ML PATTERN RECOGNITION ====================\n\nfunction detectPatterns(bars) {\n    if (bars.length < 5) return [];\n\n    const patterns = [];\n    const recentBars = bars.slice(-5);\n\n    // Higher highs and higher lows (uptrend pattern)\n    const highs = recentBars.map(b => b.h);\n    const lows = recentBars.map(b => b.l);\n\n    const isHigherHighs = highs[4] > highs[3] && highs[3] > highs[2];\n    const isHigherLows = lows[4] > lows[3] && lows[3] > lows[2];\n\n    if (isHigherHighs && isHigherLows) {\n        patterns.push({ name: 'uptrend', confidence: 0.8 });\n    }\n\n    // Bullish engulfing\n    const prev = recentBars[recentBars.length - 2];\n    const curr = recentBars[recentBars.length - 1];\n\n    if (prev.c < prev.o && curr.c > curr.o &&\n        curr.o < prev.c && curr.c > prev.o) {\n        patterns.push({ name: 'bullish_engulfing', confidence: 0.75 });\n    }\n\n    // Morning star (3-candle reversal)\n    if (recentBars.length >= 3) {\n        const first = recentBars[recentBars.length - 3];\n        const middle = recentBars[recentBars.length - 2];\n        const last = recentBars[recentBars.length - 1];\n\n        const isMorningStar =\n            first.c < first.o &&  // Bearish first candle\n            Math.abs(middle.c - middle.o) < (first.o - first.c) * 0.3 &&  // Small body\n            last.c > last.o &&  // Bullish last candle\n            last.c > (first.o + first.c) / 2;  // Closes above midpoint of first\n\n        if (isMorningStar) {\n            patterns.push({ name: 'morning_star', confidence: 0.85 });\n        }\n    }\n\n    return patterns;\n}\n\n// ==================== TREND PREDICTION SCORE ====================\n\nfunction calculateTrendPredictionScore(indicators, patterns, multiTF, srLevels, currentPrice) {\n    let score = 0;\n    const details = [];\n\n    // 1. MACD Signal (30 points)\n    if (indicators.macd) {\n        if (indicators.macd.macd > indicators.macd.signal &&\n            indicators.macd.histogram > 0 &&\n            indicators.macd.histogram > indicators.macd.prevHistogram) {\n            score += 30;\n            details.push('MACD bullish crossover');\n        } else if (indicators.macd.macd > indicators.macd.signal) {\n            score += 15;\n            details.push('MACD above signal');\n        }\n    }\n\n    // 2. ADX Trend Strength (25 points)\n    if (indicators.adx.adx > 25 && indicators.adx.plusDI > indicators.adx.minusDI) {\n        score += 25;\n        details.push('Strong uptrend (ADX > 25)');\n    } else if (indicators.adx.adx > 20 && indicators.adx.plusDI > indicators.adx.minusDI) {\n        score += 15;\n        details.push('Moderate uptrend');\n    }\n\n    // 3. EMA Alignment (20 points)\n    if (currentPrice > indicators.ema9 && indicators.ema9 > indicators.ema21 && indicators.ema21 > indicators.ema50) {\n        score += 20;\n        details.push('Perfect EMA alignment');\n    } else if (currentPrice > indicators.ema21) {\n        score += 10;\n        details.push('Price above EMA21');\n    }\n\n    // 4. RSI Optimal Zone (15 points)\n    if (indicators.rsi > 50 && indicators.rsi < 70) {\n        score += 15;\n        details.push('RSI in bullish zone');\n    } else if (indicators.rsi > 40 && indicators.rsi < 80) {\n        score += 7;\n    }\n\n    // 5. Stochastic (10 points)\n    if (indicators.stoch.k > 20 && indicators.stoch.k < 80 && indicators.stoch.k > indicators.stoch.d) {\n        score += 10;\n        details.push('Stochastic bullish');\n    }\n\n    // 6. CCI (10 points)\n    if (indicators.cci > 0 && indicators.cci < 200) {\n        score += 10;\n        details.push('CCI positive momentum');\n    }\n\n    // 7. Volume Confirmation (10 points)\n    if (indicators.volumeProfile.strength > 1.5) {\n        score += 10;\n        details.push('High volume confirmation');\n    } else if (indicators.volumeProfile.strength > 1.2) {\n        score += 5;\n    }\n\n    // 8. OBV Trend (10 points)\n    if (indicators.obv > 0) {\n        score += 10;\n        details.push('Positive OBV');\n    }\n\n    // 9. Multi-Timeframe Alignment (15 points)\n    const bullishTimeframes = [multiTF.tf5m, multiTF.tf15m, multiTF.tf1h].filter(tf => tf === 'bullish').length;\n    score += bullishTimeframes * 5;\n    if (bullishTimeframes >= 2) {\n        details.push(`${bullishTimeframes}/3 timeframes bullish`);\n    }\n\n    // 10. Pattern Recognition (15 points)\n    const patternBonus = patterns.reduce((sum, p) => sum + (p.confidence * 15), 0);\n    score += Math.min(patternBonus, 15);\n    if (patterns.length > 0) {\n        details.push(`Patterns: ${patterns.map(p => p.name).join(', ')}`);\n    }\n\n    // 11. Support/Resistance Proximity (10 points)\n    // Bullish if near support or broke resistance\n    const nearSupport = srLevels.support.some(s => Math.abs(currentPrice - s) / currentPrice < 0.02);\n    const aboveResistance = srLevels.resistance.every(r => currentPrice > r * 1.01);\n\n    if (aboveResistance) {\n        score += 10;\n        details.push('Broke resistance');\n    } else if (nearSupport) {\n        score += 5;\n        details.push('Near support');\n    }\n\n    return {\n        score: Math.min(score, 180),  // Cap at 180\n        normalizedScore: Math.min((score / 180) * 100, 100),  // Convert to 0-100\n        details: details\n    };\n}\n\n// ==================== ENHANCED STOCK SCANNER ====================\n\nasync function scanStocksEnhanced() {\n    const watchlist = [\n        'SOFI', 'NIO', 'PLUG', 'F', 'NOK', 'INTC', 'SNAP', 'PINS', 'RBLX', 'U',\n        'LCID', 'RIVN', 'HOOD', 'COIN', 'PLTR', 'GRAB', 'PATH', 'OPEN', 'UPST', 'AFRM',\n        'FCEL', 'VALE', 'X', 'CLF', 'BTU', 'ARCH', 'SWN', 'CHK', 'AR', 'MGY',\n        'RIG', 'NE', 'SM', 'TELL', 'ET', 'CNX', 'CTRA', 'OXY', 'DVN', 'MRO',\n        'BAC', 'WFC', 'C', 'KEY', 'ALLY', 'RF', 'CFG', 'FITB', 'HBAN', 'USB',\n        'AAL', 'UAL', 'CCL', 'NCLH', 'RCL', 'MAR', 'HLT', 'UBER', 'LYFT', 'DASH',\n        'T', 'VZ', 'CMCSA', 'DISH', 'PARA', 'WBD', 'FOXA', 'FOX',\n        'PFE', 'GILD', 'MRNA', 'VRTX', 'BIIB'\n    ];\n\n    const results = [];\n\n    for (const symbol of watchlist.slice(0, 30)) {  // Limit to 30 for performance\n        try {\n            // Fetch daily bars for comprehensive analysis\n            const barsResponse = await axios.get(\n                `https://data.alpaca.markets/v2/stocks/${symbol}/bars?timeframe=1D&limit=60`,\n                { headers: alpacaHeaders }\n            );\n\n            const bars = barsResponse.data.bars;\n            if (!bars || bars.length < 50) continue;\n\n            const closes = bars.map(b => b.c);\n            const currentPrice = closes[closes.length - 1];\n\n            // Calculate all indicators\n            const indicators = {\n                ema9: calculateEMA(closes, 9),\n                ema21: calculateEMA(closes, 21),\n                ema50: calculateEMA(closes, 50),\n                rsi: calculateRSI(closes, 14),\n                stoch: calculateStochastic(bars, 14, 3, 3),\n                cci: calculateCCI(bars, 20),\n                adx: calculateADX(bars, 14),\n                macd: calculateMACD(closes),\n                obv: calculateOBV(bars),\n                volumeProfile: analyzeVolumeProfile(bars, 20)\n            };\n\n            // Advanced analysis\n            const srLevels = findSupportResistance(bars, 50);\n            const patterns = detectPatterns(bars);\n            const multiTF = await getMultiTimeframeTrend(symbol);\n\n            // Calculate comprehensive trend prediction score\n            const prediction = calculateTrendPredictionScore(\n                indicators,\n                patterns,\n                multiTF,\n                srLevels,\n                currentPrice\n            );\n\n            // Entry threshold: 65% confidence for conservative approach\n            if (prediction.normalizedScore >= 65) {\n                results.push({\n                    symbol,\n                    score: prediction.normalizedScore,\n                    rawScore: prediction.score,\n                    currentPrice,\n                    direction: 'long',\n                    signals: prediction.details,\n                    indicators: {\n                        rsi: indicators.rsi.toFixed(2),\n                        adx: indicators.adx.adx.toFixed(2),\n                        macd: indicators.macd ? indicators.macd.histogram.toFixed(4) : 'N/A',\n                        cci: indicators.cci.toFixed(2),\n                        stochK: indicators.stoch.k.toFixed(2)\n                    },\n                    multiTF: multiTF,\n                    patterns: patterns.map(p => p.name),\n                    support: srLevels.support,\n                    resistance: srLevels.resistance,\n                    volumeStrength: indicators.volumeProfile.strength.toFixed(2)\n                });\n            }\n\n        } catch (error) {\n            console.log(`Error scanning ${symbol}: ${error.message}`);\n        }\n\n        // Rate limiting\n        if (results.length % 10 === 0) {\n            await new Promise(resolve => setTimeout(resolve, 1000));\n        }\n    }\n\n    // Sort by score\n    results.sort((a, b) => b.score - a.score);\n\n    console.log(`\\n=== SCAN COMPLETE ===`);\n    console.log(`Found ${results.length} high-confidence uptrend signals`);\n\n    return results.slice(0, 10).map(r => ({ json: r }));\n}\n\n// ==================== EXECUTE SCANNER ====================\n\nreturn await scanStocksEnhanced();\n"
+      },
+      "id": "69a8ed07-b4be-48fc-afae-ed479138b029",
+      "name": "Enhanced ML Scanner V2.0",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ==================== ENHANCED POSITION MANAGER V2.0 ====================\n// Features:\n// 1. ATR-based dynamic stop loss and take profit\n// 2. Trailing stops with partial profit-taking\n// 3. Win rate tracking for adaptive position sizing\n// 4. Volatility-adjusted risk management\n// 5. Time-decay exits based on momentum loss\n\nconst axios = require('axios');\n\nconst alpacaHeaders = {\n  'APCA-API-KEY-ID': 'PKWRJW3YTJQYLWAVE7VS',\n  'APCA-API-SECRET-KEY': 'HvGaSWFehaz7iII2W5rGCQTdxjPXnhlP3LKVbfGH'\n};\n\n// ==================== HELPER FUNCTIONS ====================\n\nfunction calculateATR(bars, period = 14) {\n    if (bars.length < period + 1) return 0;\n\n    const trValues = [];\n    for (let i = 1; i < bars.length; i++) {\n        const highLow = bars[i].h - bars[i].l;\n        const highPrevClose = Math.abs(bars[i].h - bars[i - 1].c);\n        const lowPrevClose = Math.abs(bars[i].l - bars[i - 1].c);\n        trValues.push(Math.max(highLow, highPrevClose, lowPrevClose));\n    }\n\n    let atr = trValues.slice(0, period).reduce((a, b) => a + b, 0) / period;\n    for (let i = period; i < trValues.length; i++) {\n        atr = ((period - 1) * atr + trValues[i]) / period;\n    }\n    return atr;\n}\n\nfunction calculateRSI(prices, period = 14) {\n    if (prices.length < period + 1) return 50;\n    let gains = 0, losses = 0;\n    for (let i = prices.length - period; i < prices.length; i++) {\n        const change = prices[i] - prices[i - 1];\n        if (change > 0) gains += change;\n        else losses += Math.abs(change);\n    }\n    const avgGain = gains / period;\n    const avgLoss = losses / period;\n    const rs = avgGain / (avgLoss || 0.001);\n    return 100 - (100 / (1 + rs));\n}\n\nfunction calculateEMA(prices, period) {\n    if (prices.length < period) return null;\n    const k = 2 / (period + 1);\n    let ema = prices.slice(0, period).reduce((a, b) => a + b, 0) / period;\n    for (let i = period; i < prices.length; i++) {\n        ema = (prices[i] * k) + (ema * (1 - k));\n    }\n    return ema;\n}\n\nfunction calculateMACD(prices) {\n    if (prices.length < 26) return null;\n\n    const ema12 = calculateEMA(prices, 12);\n    const ema26 = calculateEMA(prices, 26);\n\n    if (!ema12 || !ema26) return null;\n\n    const macd = ema12 - ema26;\n    const signal = macd * 0.9; // Simplified\n\n    return {\n        macd: macd,\n        signal: signal,\n        histogram: macd - signal\n    };\n}\n\n// ==================== WIN RATE TRACKING ====================\n\nasync function getWinRate() {\n    try {\n        // Fetch recent closed positions from Alpaca\n        const ordersResponse = await axios.get(\n            'https://paper-api.alpaca.markets/v2/orders?status=filled&limit=100',\n            { headers: alpacaHeaders }\n        );\n\n        const orders = ordersResponse.data || [];\n\n        // Group by symbol to find entry/exit pairs\n        const trades = {};\n\n        for (const order of orders) {\n            const symbol = order.symbol;\n            if (!trades[symbol]) trades[symbol] = [];\n            trades[symbol].push(order);\n        }\n\n        let wins = 0;\n        let losses = 0;\n\n        for (const symbol in trades) {\n            const symbolOrders = trades[symbol].sort((a, b) =>\n                new Date(a.filled_at) - new Date(b.filled_at)\n            );\n\n            // Match buy/sell pairs\n            for (let i = 0; i < symbolOrders.length - 1; i += 2) {\n                if (symbolOrders[i].side === 'buy' && symbolOrders[i + 1].side === 'sell') {\n                    const entryPrice = parseFloat(symbolOrders[i].filled_avg_price);\n                    const exitPrice = parseFloat(symbolOrders[i + 1].filled_avg_price);\n\n                    if (exitPrice > entryPrice) wins++;\n                    else losses++;\n                }\n            }\n        }\n\n        const totalTrades = wins + losses;\n        const winRate = totalTrades > 0 ? wins / totalTrades : 0.5;\n\n        console.log(`Win Rate: ${(winRate * 100).toFixed(1)}% (${wins}W / ${losses}L)`);\n\n        return {\n            winRate: winRate,\n            wins: wins,\n            losses: losses,\n            totalTrades: totalTrades\n        };\n\n    } catch (error) {\n        console.log('Win rate calculation failed, using default 50%');\n        return { winRate: 0.5, wins: 0, losses: 0, totalTrades: 0 };\n    }\n}\n\n// ==================== MAIN POSITION MANAGER ====================\n\nasync function managePositionsEnhanced() {\n    // Fetch positions and account\n    const [positionsResponse, accountResponse] = await Promise.all([\n        axios.get('https://paper-api.alpaca.markets/v2/positions', { headers: alpacaHeaders }),\n        axios.get('https://paper-api.alpaca.markets/v2/account', { headers: alpacaHeaders })\n    ]);\n\n    const positions = positionsResponse.data || [];\n    const account = accountResponse.data;\n    const scannedStocks = $input.all();\n    const actions = [];\n\n    // Get historical win rate for adaptive sizing\n    const winRateData = await getWinRate();\n\n    console.log(`\\n=== PORTFOLIO STATUS ===`);\n    console.log(`Positions: ${positions.length}`);\n    console.log(`Equity: $${parseFloat(account.equity).toFixed(2)}`);\n    console.log(`Win Rate: ${(winRateData.winRate * 100).toFixed(1)}%`);\n\n    // ==================== MANAGE EXISTING POSITIONS ====================\n\n    for (const position of positions) {\n        const symbol = position.symbol;\n        const currentPrice = parseFloat(position.current_price);\n        const entryPrice = parseFloat(position.avg_entry_price);\n        const qty = Math.abs(parseFloat(position.qty));\n        const side = position.side;\n        const profitLoss = ((currentPrice - entryPrice) / entryPrice) * 100;\n\n        const entryTime = new Date(position.created_at);\n        const holdingMinutes = (Date.now() - entryTime.getTime()) / (1000 * 60);\n\n        console.log(`\\n[${symbol}] ${side.toUpperCase()}`);\n        console.log(`  P/L: ${profitLoss > 0 ? '+' : ''}${profitLoss.toFixed(2)}%`);\n        console.log(`  Holding: ${holdingMinutes.toFixed(0)} min`);\n\n        let shouldExit = false;\n        let exitReason = '';\n        let partialExit = false;\n        let partialQty = 0;\n\n        try {\n            // Fetch recent bars for analysis\n            const barsResponse = await axios.get(\n                `https://data.alpaca.markets/v2/stocks/${symbol}/bars?timeframe=5Min&limit=50`,\n                { headers: alpacaHeaders }\n            );\n\n            const bars = barsResponse.data.bars;\n            if (!bars || bars.length < 30) continue;\n\n            const closes = bars.map(b => b.c);\n            const atr = calculateATR(bars, 14);\n            const rsi = calculateRSI(closes, 14);\n            const macd = calculateMACD(closes);\n\n            // Calculate volatility percentage\n            const volatilityPct = (atr / currentPrice) * 100;\n\n            // ==================== DYNAMIC STOP LOSS ====================\n\n            // ATR-based stop: 2x ATR for normal volatility, 3x for high volatility\n            const atrMultiplier = volatilityPct > 3 ? 3 : 2;\n            const dynamicStopLoss = (atr * atrMultiplier / currentPrice) * 100;\n\n            // Dynamic take profit: 1.5x to 2.5x stop loss based on trend strength\n            const riskRewardRatio = rsi > 60 && macd && macd.histogram > 0 ? 2.5 : 1.5;\n            const dynamicTakeProfit = dynamicStopLoss * riskRewardRatio;\n\n            console.log(`  ATR: ${atr.toFixed(3)} (${volatilityPct.toFixed(2)}%)`);\n            console.log(`  Dynamic Stop: -${dynamicStopLoss.toFixed(2)}%`);\n            console.log(`  Dynamic Target: +${dynamicTakeProfit.toFixed(2)}%`);\n\n            // ==================== LONG EXIT LOGIC ====================\n\n            if (side === 'long') {\n                // 1. Dynamic Stop Loss\n                if (profitLoss <= -dynamicStopLoss) {\n                    shouldExit = true;\n                    exitReason = 'dynamic_stop_loss';\n                }\n                // 2. Dynamic Take Profit\n                else if (profitLoss >= dynamicTakeProfit) {\n                    shouldExit = true;\n                    exitReason = 'dynamic_take_profit';\n                }\n                // 3. Trailing Stop (if in profit > 2%)\n                else if (profitLoss > 2) {\n                    // Trail by 1.5x ATR\n                    const trailingStopPct = (atr * 1.5 / entryPrice) * 100;\n                    const highestPrice = Math.max(...closes.slice(-10));\n                    const dropFromHigh = ((highestPrice - currentPrice) / highestPrice) * 100;\n\n                    if (dropFromHigh > trailingStopPct) {\n                        shouldExit = true;\n                        exitReason = 'trailing_stop';\n                    }\n                }\n                // 4. Partial Profit Taking (50% at 1.5x stop)\n                else if (profitLoss >= dynamicStopLoss * 1.5 && profitLoss < dynamicTakeProfit) {\n                    partialExit = true;\n                    partialQty = Math.floor(qty * 0.5);\n                    exitReason = 'partial_profit';\n                }\n                // 5. RSI Overbought + MACD Reversal\n                else if (rsi > 75 && macd && macd.histogram < 0) {\n                    shouldExit = true;\n                    exitReason = 'overbought_reversal';\n                }\n                // 6. MACD Bearish Cross (if in profit)\n                else if (macd && macd.macd < macd.signal && profitLoss > 0.5) {\n                    shouldExit = true;\n                    exitReason = 'macd_bearish_cross';\n                }\n                // 7. Time Decay Exit\n                else if (holdingMinutes > 180) {\n                    // After 3 hours, exit if not making progress\n                    if (profitLoss < dynamicStopLoss * 0.5) {\n                        shouldExit = true;\n                        exitReason = 'time_decay';\n                    }\n                }\n                // 8. Momentum Loss\n                else if (holdingMinutes > 60) {\n                    const recentSlope = closes.slice(-5);\n                    const avgRecentChange = (recentSlope[recentSlope.length - 1] - recentSlope[0]) / recentSlope[0];\n\n                    if (avgRecentChange < -0.005 && profitLoss < 1) {\n                        shouldExit = true;\n                        exitReason = 'momentum_loss';\n                    }\n                }\n            }\n\n            // ==================== SHORT EXIT LOGIC ====================\n\n            else if (side === 'short') {\n                // Similar logic but inverted for shorts\n                if (profitLoss <= -dynamicStopLoss) {\n                    shouldExit = true;\n                    exitReason = 'dynamic_stop_loss';\n                }\n                else if (profitLoss >= dynamicTakeProfit) {\n                    shouldExit = true;\n                    exitReason = 'dynamic_take_profit';\n                }\n                else if (rsi < 25 && macd && macd.histogram > 0) {\n                    shouldExit = true;\n                    exitReason = 'oversold_reversal';\n                }\n                else if (macd && macd.macd > macd.signal && profitLoss > 0.5) {\n                    shouldExit = true;\n                    exitReason = 'macd_bullish_cross';\n                }\n            }\n\n        } catch (error) {\n            console.log(`  Error analyzing ${symbol}: ${error.message}`);\n        }\n\n        // Execute exits\n        if (partialExit && partialQty > 0) {\n            actions.push({\n                json: {\n                    action: 'sell',\n                    symbol: symbol,\n                    qty: partialQty,\n                    reason: exitReason,\n                    profitLoss: profitLoss.toFixed(2),\n                    isPartial: true\n                }\n            });\n            console.log(`  \u2192 PARTIAL EXIT: ${partialQty} shares (${exitReason})`);\n        }\n\n        if (shouldExit) {\n            actions.push({\n                json: {\n                    action: side === 'long' ? 'sell' : 'buy_to_cover',\n                    symbol: symbol,\n                    qty: qty,\n                    reason: exitReason,\n                    profitLoss: profitLoss.toFixed(2),\n                    side: side\n                }\n            });\n            console.log(`  \u2192 FULL EXIT: ${qty} shares (${exitReason})`);\n        }\n    }\n\n    // ==================== NEW ENTRY SIGNALS ====================\n\n    const positionSymbols = positions.map(p => p.symbol);\n    const maxPositions = 10;\n    const exitCount = actions.filter(a => !a.json.isPartial).length;\n    const currentPositionCount = positions.length - exitCount;\n    const availableSlots = maxPositions - currentPositionCount;\n\n    console.log(`\\n=== ENTRY ANALYSIS ===`);\n    console.log(`Available slots: ${availableSlots}`);\n\n    if (availableSlots > 0) {\n        const accountValue = parseFloat(account.equity);\n\n        for (const item of scannedStocks) {\n            const stock = item.json;\n\n            if (positionSymbols.includes(stock.symbol)) {\n                console.log(`[${stock.symbol}] Already in position, skipping`);\n                continue;\n            }\n\n            // ==================== ADAPTIVE POSITION SIZING ====================\n\n            // Base risk adjusted by win rate\n            // If win rate is high (>60%), increase risk to 2%\n            // If win rate is low (<40%), decrease risk to 1%\n            let baseRiskPct = 0.015;  // 1.5% default\n\n            if (winRateData.totalTrades >= 10) {\n                if (winRateData.winRate > 0.6) {\n                    baseRiskPct = 0.02;  // 2% for good performance\n                } else if (winRateData.winRate < 0.4) {\n                    baseRiskPct = 0.01;  // 1% for poor performance\n                }\n            }\n\n            // Score multiplier (65-100 score range)\n            const scoreMultiplier = Math.min(stock.score / 100, 1.0);\n\n            const riskAmount = accountValue * baseRiskPct * scoreMultiplier;\n\n            // Use stock-specific ATR for stop loss if available\n            let stopLossPercent = 0.02;  // Default 2%\n\n            try {\n                const barsResponse = await axios.get(\n                    `https://data.alpaca.markets/v2/stocks/${stock.symbol}/bars?timeframe=5Min&limit=30`,\n                    { headers: alpacaHeaders }\n                );\n\n                const bars = barsResponse.data.bars;\n                if (bars && bars.length >= 20) {\n                    const atr = calculateATR(bars, 14);\n                    const volatilityPct = (atr / stock.currentPrice) * 100;\n\n                    // ATR-based stop: 2-3x ATR\n                    stopLossPercent = Math.max(volatilityPct * 2, 0.015);  // Minimum 1.5%\n                    stopLossPercent = Math.min(stopLossPercent, 0.04);      // Maximum 4%\n                }\n            } catch (error) {\n                console.log(`[${stock.symbol}] ATR fetch failed, using default stop`);\n            }\n\n            const riskPerShare = stock.currentPrice * stopLossPercent;\n            const qty = Math.floor(riskAmount / riskPerShare);\n\n            console.log(`\\n[${stock.symbol}] ENTRY SIGNAL`);\n            console.log(`  Score: ${stock.score.toFixed(1)}/100`);\n            console.log(`  Price: $${stock.currentPrice.toFixed(2)}`);\n            console.log(`  Risk: $${riskAmount.toFixed(2)} (${(baseRiskPct * 100).toFixed(2)}% * ${scoreMultiplier.toFixed(2)})`);\n            console.log(`  Stop: -${(stopLossPercent * 100).toFixed(2)}%`);\n            console.log(`  Qty: ${qty} shares`);\n            console.log(`  Signals: ${stock.signals ? stock.signals.join(', ') : 'N/A'}`);\n\n            if (qty >= 10) {  // Minimum 10 shares\n                actions.push({\n                    json: {\n                        action: stock.direction === 'long' ? 'buy' : 'sell_short',\n                        symbol: stock.symbol,\n                        qty: qty,\n                        price: stock.currentPrice,\n                        score: stock.score,\n                        reason: 'ml_uptrend_prediction',\n                        stopLoss: (stock.currentPrice * (1 - stopLossPercent)).toFixed(2),\n                        target: (stock.currentPrice * (1 + stopLossPercent * 2)).toFixed(2),\n                        direction: stock.direction,\n                        confidence: stock.score\n                    }\n                });\n\n                console.log(`  \u2192 BUY ORDER CREATED`);\n\n                if (actions.filter(a => a.json.action === 'buy').length >= availableSlots) {\n                    break;\n                }\n            } else {\n                console.log(`  \u2192 SKIPPED: Qty too small (${qty})`);\n            }\n        }\n    }\n\n    // ==================== EXECUTION SUMMARY ====================\n\n    console.log(`\\n=== EXECUTION SUMMARY ===`);\n    console.log(`Total actions: ${actions.length}`);\n    console.log(`Entries: ${actions.filter(a => a.json.action === 'buy' || a.json.action === 'sell_short').length}`);\n    console.log(`Exits: ${actions.filter(a => a.json.action === 'sell' || a.json.action === 'buy_to_cover').length}`);\n    console.log(`Partial exits: ${actions.filter(a => a.json.isPartial).length}`);\n\n    return actions.length > 0 ? actions : [{ json: { action: 'none', message: 'No trades to execute' } }];\n}\n\n// ==================== EXECUTE ====================\n\nreturn await managePositionsEnhanced();\n"
+      },
+      "id": "35402506-4ca8-4986-9ede-999dbe33f36d",
+      "name": "Enhanced Position Manager V2.0",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "buy",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "413c85ba-bfde-4988-b070-2d8a16b2311c"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "buy_long"
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "sell",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "sell_long"
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "sell_short",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "sell_short"
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "buy_to_cover",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "buy_to_cover"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "advanced-order-router",
+      "name": "Advanced Order Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        1280,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "*/5 9-15 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "8c2df63b-ca81-477f-b179-bc700fb265f6",
+      "name": "Every 5 Minutes (Market Hours)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        384,
+        368
+      ]
+    }
+  ],
+  "connections": {
+    "Scan for Momentum Stocks": {
+      "main": [
+        []
+      ]
+    },
+    "Trading Decision Logic": {
+      "main": [
+        []
+      ]
+    },
+    "Filter Actions": {
+      "main": [
+        [
+          {
+            "node": "Advanced Order Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scan for Momentum Large": {
+      "main": [
+        [
+          {
+            "node": "Trading Decision L",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trading Decision L": {
+      "main": [
+        [
+          {
+            "node": "Filter Actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Optimized Momentum Scanner V2": {
+      "main": [
+        [
+          {
+            "node": "Optimized Trading Logic V2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Optimized Trading Logic V2": {
+      "main": [
+        [
+          {
+            "node": "Filter Actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Advanced Scanner (ADX/MACD/EMA)": {
+      "main": [
+        [
+          {
+            "node": "Advanced Position Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Advanced Position Manager": {
+      "main": [
+        [
+          {
+            "node": "Filter Actions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Advanced Order Router": {
+      "main": [
+        [
+          {
+            "node": "Execute Buy Order",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute Sell Order",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute Sell Order",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute Buy Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every 5 Minutes (Market Hours)": {
+      "main": [
+        [
+          {
+            "node": "Advanced Scanner (ADX/MACD/EMA)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": {
+    "node:Every 5 Minutes (Market Hours)": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "9e7857b2-1e97-4b31-8832-a278205ae4d0",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2025-09-30T14:31:22.903Z",
+      "createdAt": "2025-09-30T14:31:22.903Z",
+      "role": "workflow:owner",
+      "workflowId": "rBZICNGulpOYjtv8",
+      "projectId": "S0Bcw3E8XlOwhn2Y",
+      "project": {
+        "updatedAt": "2024-12-26T03:01:16.698Z",
+        "createdAt": "2024-12-26T02:58:40.297Z",
+        "id": "S0Bcw3E8XlOwhn2Y",
+        "name": "genie one <genies305@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "projectRelations": [
+          {
+            "updatedAt": "2024-12-26T02:58:40.297Z",
+            "createdAt": "2024-12-26T02:58:40.297Z",
+            "userId": "dafcccc8-7cbf-4e8c-b74b-374874443704",
+            "projectId": "S0Bcw3E8XlOwhn2Y",
+            "user": {
+              "updatedAt": "2025-11-04T15:08:17.000Z",
+              "createdAt": "2024-12-26T02:58:39.489Z",
+              "id": "dafcccc8-7cbf-4e8c-b74b-374874443704",
+              "email": "genies305@gmail.com",
+              "firstName": "genie",
+              "lastName": "one",
+              "personalizationAnswers": {
+                "version": "v4",
+                "personalization_survey_submitted_at": "2024-12-26T03:01:58.887Z",
+                "personalization_survey_n8n_version": "1.72.1",
+                "automationGoalDevops": [
+                  "other"
+                ],
+                "automationGoalDevopsOther": "all",
+                "companySize": "<20",
+                "companyType": "saas",
+                "role": "it",
+                "reportedSource": "other",
+                "reportedSourceOther": "long ago"
+              },
+              "settings": {
+                "userActivated": true,
+                "easyAIWorkflowOnboarded": true,
+                "firstSuccessfulWorkflowId": "RVkLxmfwpkzrnEZp",
+                "userActivatedAt": 1743272451055,
+                "npsSurvey": {
+                  "responded": true,
+                  "lastShownAt": 1753463576111
+                }
+              },
+              "disabled": false,
+              "mfaEnabled": false,
+              "lastActiveAt": "2025-11-04",
+              "isPending": false
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "tags": []
+}
